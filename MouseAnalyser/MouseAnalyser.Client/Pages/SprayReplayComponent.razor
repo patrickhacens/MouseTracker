@@ -1,0 +1,163 @@
+﻿@using MouseTracker
+@using SkiaSharp
+@using SkiaSharp.Views.Blazor
+
+@if (Spray != null)
+{
+
+	<SKCanvasView @ref="view"
+				  style="width:100%"
+				  EnableRenderLoop OnPaintSurface="Paint"
+				  @rendermode="RenderMode.InteractiveWebAssembly" />
+
+	<MudSlider T="double" Max="timeRange.TotalMilliseconds"
+			   Min="0"
+			   Value="currentTime.TotalMilliseconds"
+			   ValueLabel
+			   ValueChanged="e => currentTime = TimeSpan.FromMilliseconds(e)" />
+
+	<MudStack Row>
+		<MudText>@TimeSpan.Zero</MudText>
+		<MudSpacer />
+		<MudText>@TimeSpan.FromMilliseconds(timeRange.TotalMilliseconds)</MudText>
+	</MudStack>
+	<MudStack Row>
+		<MudText>@start</MudText>
+		<MudSpacer />
+		<MudText>@end</MudText>
+	</MudStack>
+
+	<MudText>Zoom: @Zoom</MudText>
+	<MudSlider T="float" Min="0" Max="5" @bind-Value="Zoom" Step="0.01f" />
+
+	<MudText>PanX: @PanX</MudText>
+	<MudSlider T="float" Min="-ScreenWidth" Max="ScreenWidth" @bind-Value="PanX" Step="0.01f" />
+
+	<MudText>PanY: @PanY</MudText>
+	<MudSlider T="float" Min="-ScreenHeight" Max="ScreenHeight" @bind-Value="PanY" Step="0.01f" />
+}
+else
+{
+	<MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+	<MudCardContent>
+		<MudSkeleton Width="30%" Height="42px;" />
+		<MudSkeleton Width="80%" />
+		<MudSkeleton Width="100%" />
+	</MudCardContent>
+	<MudCardActions>
+		<MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+		<MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+	</MudCardActions>
+}
+
+
+@code {
+	SKCanvasView view = null!;
+
+	// public Spray? Spray { get; set; }
+
+	private Spray? _spray;
+
+	[Parameter]
+	public int ScreenWidth { get; set; }
+
+	[Parameter]
+	public int ScreenHeight { get; set; }
+
+	[Parameter]
+	public Spray? Spray
+	{
+		get => _spray;
+		set
+		{
+			_spray = value;
+
+			start = value?.Start ?? DateTime.MinValue;
+			end = value?.End ?? DateTime.MinValue;
+			timeRange = value?.Duration ?? TimeSpan.Zero;
+			currentTime = TimeSpan.Zero;
+			if (value?.Items?.Length > 0)
+				offset = new SKPoint(
+					value.Items.First().X - ScreenWidth / 2,
+					value.Items.First().Y - ScreenHeight / 2
+				);
+		}
+	}
+
+
+	DateTime start;
+	DateTime end;
+	TimeSpan timeRange;
+	TimeSpan currentTime = TimeSpan.Zero;
+	SKPoint offset;
+	int speed = 1;
+
+	float Zoom = 1;
+	float PanX;
+	float PanY;
+
+	bool play;
+
+	SKPaint[] paints = [];
+	SKPaint borderPaint = null!;
+
+
+	protected override void OnInitialized()
+	{
+		borderPaint = new SKPaint()
+			{
+				IsStroke = true,
+				Color = SKColors.Black
+			};
+		paints = new[] {
+			CreatePaint(SKColors.Black),
+			CreatePaint(SKColors.Blue),
+			CreatePaint(SKColors.Red)
+		};
+	}
+
+	void Paint(SKPaintSurfaceEventArgs e)
+	{
+		if (Spray is not null)
+		{
+			var data = Spray.Items.TakeWhile(data => (data.Date - start) < currentTime);
+			int counter = 0;
+			var canvas = e.Surface.Canvas;
+			canvas.Clear(SKColors.White);
+			canvas.Scale(Zoom, Zoom, e.RawInfo.Size.Width / 2, e.RawInfo.Size.Height/2);
+			canvas.Translate(PanX, PanY);
+			canvas.DrawRect(0, 0, e.RawInfo.Size.Width, e.RawInfo.Size.Height, paints[0]);
+			if (data.Any())
+			{
+				var prev = data.First();
+				foreach (var item in data.Skip(1))
+				{
+					canvas.DrawLine(
+						PointOnScreen(prev, e.RawInfo.Size),
+						PointOnScreen(item, e.RawInfo.Size),
+						paints[counter++ % paints.Length]);
+					prev = item;
+				}
+			}
+		}
+	}
+
+	SKPoint PointOnScreen(Data data, SKSizeI canvasSize)
+		=> new SKPoint(
+			ThreeRule(ScreenWidth, canvasSize.Width, data.X - offset.X),
+			ThreeRule(ScreenHeight, canvasSize.Height, data.Y - offset.Y));
+
+	float ThreeRule(float total, float minTotal, float current)
+	{
+		return minTotal * current / total;
+	}
+
+	SKPaint CreatePaint(SKColor color) => new SKPaint()
+		{
+			IsStroke=true,
+			IsAntialias = true,
+			FilterQuality = SKFilterQuality.High,
+			Color = color,
+			StrokeWidth = 2,
+		};
+}
