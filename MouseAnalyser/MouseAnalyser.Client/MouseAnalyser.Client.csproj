@@ -18,11 +18,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\MouseAnalyser.DTOs\MouseAnalyser.DTOs.csproj" />
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<TrimmerRootDescriptor Include="Trim.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Pages\PlayersPage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Pages\PlayersPage.razor" />
 	</ItemGroup>
 
 </Project>

@@ -11,6 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MouseAnalyser", "MouseAnaly
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MouseAnalyser.Client", "MouseAnalyser\MouseAnalyser.Client\MouseAnalyser.Client.csproj", "{6049331E-35BF-43B4-A3AA-5FC513662E1D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Packages", "Packages", "{A832374F-E69B-4032-B3EA-19EECD421342}"
+	ProjectSection(SolutionItems) = preProject
+		Packages\PUBG.Analiser.dll = Packages\PUBG.Analiser.dll
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MouseAnalyser.DTOs", "MouseAnalyser.DTOs\MouseAnalyser.DTOs.csproj", "{09B4232B-E38A-494F-9578-A99B6147CADD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +40,10 @@ Global
 		{6049331E-35BF-43B4-A3AA-5FC513662E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6049331E-35BF-43B4-A3AA-5FC513662E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6049331E-35BF-43B4-A3AA-5FC513662E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09B4232B-E38A-494F-9578-A99B6147CADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09B4232B-E38A-494F-9578-A99B6147CADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09B4232B-E38A-494F-9578-A99B6147CADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09B4232B-E38A-494F-9578-A99B6147CADD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

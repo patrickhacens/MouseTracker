@@ -1,0 +1,94 @@
+﻿@page "/players"
+@inject HttpClient client
+@inject ISnackbar snack
+@inject ILogger<PlayersPage> logger;
+
+<MudText Typo="Typo.h3"> Players </MudText>
+
+<MudGrid>
+
+	<MudItem xs="12" md="8">
+		<MudDataGrid T="Player" Dense ServerData="ServerData" @ref="table">
+			<Columns>
+				<PropertyColumn Property="p=>p.Name" />
+				<PropertyColumn Property="p=>p.PubgId" />
+				<TemplateColumn>
+					<CellTemplate>
+						<MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="async () => await Delete(context.Item.Id)" Color="Color.Error" />
+					</CellTemplate>
+				</TemplateColumn>
+			</Columns>
+		</MudDataGrid>
+	</MudItem>
+	<MudItem xs="12" md="4">
+		<MudPaper Class="pa-4">
+
+			<MudForm @ref="form">
+				<MudText Typo="Typo.h4">Add player</MudText>
+
+				<MudTextField Label="Name" @bind-Value="player.Name" Required Immediate />
+
+				<MudTextField Label="PUBG Id" @bind-Value="player.PubgId" Required Immediate />
+
+				<MudButton StartIcon="@Icons.Material.Filled.Save"
+						   Color="Color.Primary"
+						   OnClick="Save"
+						   Disabled="!form.IsValid">
+					Add Player
+				</MudButton>
+			</MudForm>
+		</MudPaper>
+	</MudItem>
+
+</MudGrid>
+
+
+@code {
+	Player player = new();
+	MudForm form = null!;
+	MudDataGrid<Player> table = null!;
+	async Task Save()
+	{
+		var response = await client.PostAsJsonAsync("api/players", player);
+		if (!response.IsSuccessStatusCode)
+			snack.Add("Could not add", Severity.Error);
+		else
+		{
+			player = new();
+			await table.ReloadServerData();
+			snack.Add("Saved", Severity.Success);
+		}
+	}
+
+
+	async Task<GridData<Player>> ServerData(GridState<Player> state)
+	{
+		try
+		{
+			var response = await client.GetFromJsonAsync<IEnumerable<Player>>("api/players");
+			return new GridData<Player>()
+				{
+					Items = response!,
+					TotalItems = response!.Count()
+				};
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, "during players acquisition");
+			snack.Add(ex.Message, Severity.Error);
+			return new();
+		}
+	}
+
+	async Task Delete(Guid id)
+	{
+		var response = await client.DeleteAsync($"api/players/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			snack.Add("Removed", Severity.Success);
+			await table.ReloadServerData();
+		}
+		else
+			snack.Add(await response.Content.ReadAsStringAsync(), Severity.Error, configure => configure.RequireInteraction = true);
+	}
+}

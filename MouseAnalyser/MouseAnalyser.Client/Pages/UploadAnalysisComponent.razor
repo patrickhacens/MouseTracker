@@ -1,0 +1,69 @@
+﻿@using MouseAnalyser.Client.Infrastructure
+@inject HttpClient http
+@inject ISnackbar snack
+@inject ILogger<UploadAnalysisComponent> logger
+@inject AnalysisObservable analysisObservable
+
+<MudFileUpload @ref="uploader"
+			   Class="ma-2 pa-2"
+			   T="IBrowserFile"
+			   InputClass="absolute mud-width-full mud-height-full overflow-hidden z-10"
+			   InputStyle="opacity:0"
+			   OnFilesChanged="LoadFiles"
+			   AppendMultipleFiles="false"
+			   Hidden="false"
+			   tabindex="-1"
+			   @ondrop="@ClearDragClass"
+			   @ondragenter="@SetDragClass"
+			   @ondragleave="@ClearDragClass"
+			   @ondragend="@ClearDragClass">
+
+	<ActivatorContent>
+		<MudPaper Height="100px" Outlined="true" Class="@_dragClass">
+			<MudText Typo="Typo.h6">
+				Drag and drop files here or click
+			</MudText>
+		</MudPaper>
+	</ActivatorContent>
+</MudFileUpload>
+
+
+@code {
+	MudFileUpload<IBrowserFile> uploader = null!;
+	const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+	string _dragClass = DefaultDragClass;
+
+	async void LoadFiles(InputFileChangeEventArgs e)
+	{
+
+		string name = e.File.Name;
+		try
+		{
+
+			var stream = e.File.OpenReadStream(maxAllowedSize: 1024 * 500000);
+			var content = new MultipartFormDataContent();
+			content.Add(new StreamContent(stream), "file", name);
+
+			var response = await http.PostAsync("/api/analyses", content);
+			if (!response.IsSuccessStatusCode)
+				snack.Add(await response.Content.ReadAsStringAsync(), Severity.Error);
+
+		}
+		catch (Exception ex)
+		{
+			snack.Add("an error ocurrend", Severity.Error);
+			logger.LogError(ex, "Could not send file to server");
+		}
+		finally
+		{
+			await uploader.ClearAsync();
+			analysisObservable.InformAnalysisChanged(new(name));
+		}
+	}
+
+	private void SetDragClass()
+		=> _dragClass = $"{DefaultDragClass} mud-border-primary";
+
+	private void ClearDragClass()
+		=> _dragClass = DefaultDragClass;
+}

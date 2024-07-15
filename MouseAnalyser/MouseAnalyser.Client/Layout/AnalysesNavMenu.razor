@@ -1,0 +1,26 @@
+﻿@using MouseAnalyser.Client.Infrastructure
+@inject HttpClient client
+@inject AnalysisObservable analysisObservable
+
+<MudNavGroup Expanded HideExpandIcon Title="Analyses" @rendermode="RenderMode.InteractiveWebAssembly">
+	@foreach (var analysis in Analyses)
+	{
+		<MudNavLink Href="@($"analyses/{analysis.Name}")" Match="NavLinkMatch.All">@analysis.Name</MudNavLink>
+	}
+</MudNavGroup>
+
+@code {
+	IEnumerable<Analysis> Analyses = Enumerable.Empty<Analysis>();
+	protected override async Task OnInitializedAsync()
+	{
+		analysisObservable.AnalysisAdded += NewAnalysis;
+		Analyses = (await client.GetFromJsonAsync<IEnumerable<Analysis>>("api/analyses"))!.OrderBy(d => d.Name);
+		await base.OnInitializedAsync();
+	}
+
+	void NewAnalysis(object sender, Analysis analysis)
+	{
+		Analyses = Analyses.Concat([analysis]).OrderBy(d => d.Name);
+		StateHasChanged();
+	}
+}

@@ -7,24 +7,33 @@
 
 <MudLayout>
 	<MudAppBar>
-		<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+		<MudIconButton Icon="@Icons.Material.Filled.Menu"
+					   Color="Color.Inherit"
+					   Edge="Edge.Start"
+					   OnClick="@((e) => DrawerToggle())" />
 		Mouse Profile Analyser
 	</MudAppBar>
-	@* <MudDrawer @bind-Open="@_drawerOpen">
+	<MudDrawer @bind-Open="@_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
 		<MudNavMenu>
-			<MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-			<MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
-			<MudNavGroup Title="Settings" Expanded="true">
-				<MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-				<MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-			</MudNavGroup>
-			<MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
+			<MudNavLink Href="/players" Match="NavLinkMatch.All">Players</MudNavLink>
+			<MudDivider />
+			<AnalysesNavMenu />
+			<MudDivider />
+			<MouseAnalyser.Client.Pages.UploadAnalysisComponent />
 		</MudNavMenu>
-	</MudDrawer> *@
-	<MudMainContent Class="ma-4">
-		@Body
+	</MudDrawer>
+	<MudMainContent>
+		<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-8">
+			@Body
+		</MudContainer>
 	</MudMainContent>
 </MudLayout>
+
+<div id="blazor-error-ui">
+	An unhandled error has occurred.
+	<a href="" class="reload">Reload</a>
+	<a class="dismiss">🗙</a>
+</div>
 
 @code {
 	bool _drawerOpen = true;
@@ -34,10 +43,3 @@
 		_drawerOpen = !_drawerOpen;
 	}
 }
-
-
-<div id="blazor-error-ui">
-	An unhandled error has occurred.
-	<a href="" class="reload">Reload</a>
-	<a class="dismiss">🗙</a>
-</div>

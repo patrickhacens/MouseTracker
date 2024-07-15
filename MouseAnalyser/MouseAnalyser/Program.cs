@@ -1,7 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
-using MouseAnalyser;
+global using MouseAnalyser;
+global using MouseTracker;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MouseAnalyser.Client.Infrastructure;
 using MouseAnalyser.Components;
+using MouseAnalyser.Domain;
+using MouseAnalyser.Infrastructure;
 using MudBlazor.Services;
+using System.Reflection;
+
+[assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +17,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
 	.AddInteractiveWebAssemblyComponents();
 
+
+builder.Services.AddDbContext<AnalysisDb>(op => op.UseSqlite("Data Source=analysisdb.sqlite").EnableDetailedErrors().EnableSensitiveDataLogging());
+
 builder.Services.AddControllers();
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped(sp => new HttpClient() { BaseAddress = new Uri("localhost:5285") });
+
+builder.Services.AddScoped(sp => new HttpClient() { BaseAddress = new Uri("http://localhost:5285") });
+
+builder.Services.AddOptions();
+
+builder.Services.Configure<AnalysisConfig>(builder.Configuration.GetSection(nameof(AnalysisConfig)));
+
+builder.Services.AddHostedService<HostedDatabaseLoader>();
+builder.Services.AddSingleton<AnalysisObservable>();
 
 var app = builder.Build();
 

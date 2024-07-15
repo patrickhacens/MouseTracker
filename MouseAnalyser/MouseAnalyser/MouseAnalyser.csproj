@@ -1,17 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\MouseAnalyser.DTOs\MouseAnalyser.DTOs.csproj" />
 		<ProjectReference Include="..\..\Shared\Shared.csproj" />
 		<ProjectReference Include="..\MouseAnalyser.Client\MouseAnalyser.Client.csproj" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
 		<PackageReference Include="Microsoft.ML" Version="3.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="PUBG.Analiser">
+	    <HintPath>..\..\Packages\PUBG.Analiser.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>
