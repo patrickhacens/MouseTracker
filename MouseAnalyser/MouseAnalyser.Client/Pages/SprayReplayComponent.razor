@@ -2,53 +2,56 @@
 @using SkiaSharp
 @using SkiaSharp.Views.Blazor
 
-@if (Spray != null)
-{
+<MudPaper Class="pa-2">
 
-	<SKCanvasView @ref="view"
-				  style="width:100%"
-				  EnableRenderLoop OnPaintSurface="Paint"
-				  @rendermode="RenderMode.InteractiveWebAssembly" />
+	@if (Spray != null)
+	{
 
-	<MudSlider T="double" Max="timeRange.TotalMilliseconds"
-			   Min="0"
-			   Value="currentTime.TotalMilliseconds"
-			   ValueLabel
-			   ValueChanged="e => currentTime = TimeSpan.FromMilliseconds(e)" />
+		<SKCanvasView @ref="view"
+					  style="width:100%"
+					  EnableRenderLoop OnPaintSurface="Paint"
+					  @rendermode="RenderMode.InteractiveWebAssembly" />
 
-	<MudStack Row>
-		<MudText>@TimeSpan.Zero</MudText>
-		<MudSpacer />
-		<MudText>@TimeSpan.FromMilliseconds(timeRange.TotalMilliseconds)</MudText>
-	</MudStack>
-	<MudStack Row>
-		<MudText>@start</MudText>
-		<MudSpacer />
-		<MudText>@end</MudText>
-	</MudStack>
+		<MudSlider T="double" Max="timeRange.TotalMilliseconds"
+				   Min="0"
+				   Value="currentTime.TotalMilliseconds"
+				   ValueLabel
+				   ValueChanged="e => currentTime = TimeSpan.FromMilliseconds(e)" />
 
-	<MudText>Zoom: @Zoom</MudText>
-	<MudSlider T="float" Min="0" Max="5" @bind-Value="Zoom" Step="0.01f" />
+		<MudStack Row>
+			<MudText>@TimeSpan.Zero</MudText>
+			<MudSpacer />
+			<MudText>@TimeSpan.FromMilliseconds(timeRange.TotalMilliseconds)</MudText>
+		</MudStack>
+		<MudStack Row>
+			<MudText>@start</MudText>
+			<MudSpacer />
+			<MudText>@end</MudText>
+		</MudStack>
 
-	<MudText>PanX: @PanX</MudText>
-	<MudSlider T="float" Min="-ScreenWidth" Max="ScreenWidth" @bind-Value="PanX" Step="0.01f" />
+		<MudText>Zoom: @Zoom</MudText>
+		<MudSlider T="float" Min="0" Max="5" @bind-Value="Zoom" Step="0.01f" />
 
-	<MudText>PanY: @PanY</MudText>
-	<MudSlider T="float" Min="-ScreenHeight" Max="ScreenHeight" @bind-Value="PanY" Step="0.01f" />
-}
-else
-{
-	<MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
-	<MudCardContent>
-		<MudSkeleton Width="30%" Height="42px;" />
-		<MudSkeleton Width="80%" />
-		<MudSkeleton Width="100%" />
-	</MudCardContent>
-	<MudCardActions>
-		<MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-		<MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-	</MudCardActions>
-}
+		<MudText>PanX: @PanX</MudText>
+		<MudSlider T="float" Min="-ScreenWidth" Max="ScreenWidth" @bind-Value="PanX" Step="0.01f" />
+
+		<MudText>PanY: @PanY</MudText>
+		<MudSlider T="float" Min="-ScreenHeight" Max="ScreenHeight" @bind-Value="PanY" Step="0.01f" />
+	}
+	else
+	{
+		<MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+		<MudCardContent>
+			<MudSkeleton Width="30%" Height="42px;" />
+			<MudSkeleton Width="80%" />
+			<MudSkeleton Width="100%" />
+		</MudCardContent>
+		<MudCardActions>
+			<MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+			<MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+		</MudCardActions>
+	}
+</MudPaper>
 
 
 @code {

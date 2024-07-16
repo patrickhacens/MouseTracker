@@ -5,9 +5,9 @@
 @inject ILogger<AnalysisPage> logger
 
 
-	<MudText Typo="Typo.h3">Analysis: @analysis </MudText>
-@* <MudGrid>
-	<MudItem xs="6">
+<MudText Typo="Typo.h3">Analysis: @Analysis </MudText>
+<MudGrid>
+	<MudItem xs="12" lg="6">
 		<MudDataGrid T="Spray"
 					 Items="Sprays"
 					 Dense
@@ -15,13 +15,14 @@
 					 SortMode="SortMode.Single"
 					 MultiSelection="false"
 					 @bind-SelectedItem="SelectedSpray"
+					 RowStyleFunc="StyleRow"
 					 Filterable FilterMode="DataGridFilterMode.Simple">
 
 			<Header>
 				<MudTextField @bind-Value="@format" />
 			</Header>
 			<Columns>
-				<SelectColumn />
+				@* <SelectColumn /> *@
 				<PropertyColumn Property="p => p.Start" Title="From" Format="@format" Sortable="true" />
 				<PropertyColumn Property="p => p.Duration" Title="Duration" Format="@format" Sortable="true" />
 				<PropertyColumn Property="p => p.Items.Length" Title="Count" Sortable="true" />
@@ -36,26 +37,41 @@
 		</MudDataGrid>
 	</MudItem>
 
-	<MudItem xs="6">
+	<MudItem xs="12" lg="6">
 		<SprayReplayComponent ScreenWidth="1920"
 							  ScreenHeight="1080"
 							  Spray="SelectedSpray" />
 	</MudItem>
-</MudGrid> *@
+</MudGrid>
 
 @code {
 
 	[Parameter]
-	public string analysis { get; set; }
+	public string Analysis { get; set; } = null!;
 
-	// IEnumerable<Spray> Sprays = Enumerable.Empty<Spray>();
+	IEnumerable<Spray> Sprays = Enumerable.Empty<Spray>();
 
-	// Spray? SelectedSpray;
+	Spray? SelectedSpray;
 
-	
-	// MudDataGrid<Spray> grid = null!;
 
-	// string format = "";
+	MudDataGrid<Spray> grid = null!;
 
-	
+	string format = "";
+
+	protected override async Task OnParametersSetAsync()
+	{
+		SelectedSpray = null;
+		Sprays = (await http.GetFromJsonAsync<IEnumerable<Spray>>($"api/analyses/{Analysis}"))!;
+	}
+
+	string StyleRow(Spray spray, int index)
+	{
+		if (spray == SelectedSpray)
+		{
+			return "background-color: var(--mud-palette-primary)";
+		}
+		return "";
+	}
+
+
 }
